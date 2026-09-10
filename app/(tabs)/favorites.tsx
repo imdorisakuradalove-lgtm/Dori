@@ -6,23 +6,52 @@ import { Card } from '@/src/design-system/components/Card';
 import { ScreenContainer } from '@/src/design-system/components/ScreenContainer';
 import { SectionHeading } from '@/src/design-system/components/SectionHeading';
 import { color, spacing, typography } from '@/src/design-system/tokens';
+import { PhraseCard } from '@/src/features/shared/components/PhraseCard';
+import { useFavoritesStore } from '@/src/state/favoritesStore';
 
 export default function FavoritesScreen() {
+  const favorites = useFavoritesStore((state) => state.favorites);
+  const storageAvailable = useFavoritesStore((state) => state.storageAvailable);
+
   return (
     <ScreenContainer>
-      <SectionHeading title="Favorites" subtitle="Phrases you pin will always be available here, offline." />
+      <SectionHeading title="Favorites" subtitle="Saved on this device — no account, works offline." />
 
-      <Card style={styles.emptyCard}>
-        <AppIcon name={{ ios: 'star', android: 'star_outline', web: 'star_outline' }} tintColor={color.textMuted} size={32} />
-        <Text style={[typography.heading, styles.emptyTitle]}>No favorites yet</Text>
-        <Text style={[typography.body, styles.emptyBody]}>
-          Favoriting isn&apos;t wired up to local storage in this build yet. Once it is (Phase 1), anything
-          you pin from Scenes or Translate will stay here and keep working offline.
-        </Text>
-        <View style={styles.badgeRow}>
-          <Badge label="Local storage — coming soon" tone="warning" />
+      {!storageAvailable ? (
+        <Card style={styles.emptyCard}>
+          <AppIcon name={{ ios: 'exclamationmark.triangle', android: 'warning', web: 'warning' }} tintColor={color.warning} size={28} />
+          <Text style={[typography.heading, styles.emptyTitle]}>Local storage unavailable</Text>
+          <Text style={[typography.body, styles.emptyBody]}>
+            This device&apos;s local database couldn&apos;t be opened, so favorites can&apos;t be saved or shown right
+            now. Scenes and Emergency still work — they don&apos;t depend on this.
+          </Text>
+        </Card>
+      ) : favorites.length === 0 ? (
+        <Card style={styles.emptyCard}>
+          <AppIcon name={{ ios: 'star', android: 'star_outline', web: 'star_outline' }} tintColor={color.textMuted} size={32} />
+          <Text style={[typography.heading, styles.emptyTitle]}>No favorites yet</Text>
+          <Text style={[typography.body, styles.emptyBody]}>
+            Tap the star on any phrase in Scenes to save it here. Favorites stay on this device and work
+            offline.
+          </Text>
+        </Card>
+      ) : (
+        <View style={styles.list}>
+          {favorites.map((favorite) => (
+            <View key={favorite.phraseKey} style={styles.item}>
+              {favorite.sceneTitle ? <Badge label={favorite.sceneTitle} tone="neutral" /> : null}
+              <PhraseCard
+                zh={favorite.zh}
+                ja={favorite.ja}
+                romaji={favorite.romaji}
+                english={favorite.english}
+                tel={favorite.tel}
+                favorite={{ phraseKey: favorite.phraseKey, sceneId: favorite.sceneId, sceneTitle: favorite.sceneTitle }}
+              />
+            </View>
+          ))}
         </View>
-      </Card>
+      )}
     </ScreenContainer>
   );
 }
@@ -38,7 +67,10 @@ const styles = StyleSheet.create({
   emptyBody: {
     color: color.textSecondary,
   },
-  badgeRow: {
-    marginTop: spacing.xs,
+  list: {
+    gap: spacing.lg,
+  },
+  item: {
+    gap: spacing.sm,
   },
 });

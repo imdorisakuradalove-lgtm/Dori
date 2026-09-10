@@ -9,11 +9,13 @@ import { ScreenContainer } from '@/src/design-system/components/ScreenContainer'
 import { SectionHeading } from '@/src/design-system/components/SectionHeading';
 import { color, spacing, typography } from '@/src/design-system/tokens';
 import { scenes } from '@/src/features/scenes/data/scenes';
+import { useFavoritesStore } from '@/src/state/favoritesStore';
 import { useNetworkStatus } from '@/src/state/useNetworkStatus';
 
 export default function HomeScreen() {
   const router = useRouter();
   const network = useNetworkStatus();
+  const favorites = useFavoritesStore((state) => state.favorites);
 
   return (
     <ScreenContainer>
@@ -79,7 +81,11 @@ export default function HomeScreen() {
       <View>
         <SectionHeading title="Favorites" />
         <Card onPress={() => router.push('/favorites')} accessibilityLabel="Open Favorites">
-          <Text style={[typography.body, styles.emptyText]}>No favorites yet. Tap to view Favorites.</Text>
+          <Text style={[typography.body, styles.emptyText]}>
+            {favorites.length === 0
+              ? 'No favorites yet. Tap to view Favorites.'
+              : `${favorites.length} saved phrase${favorites.length === 1 ? '' : 's'}. Tap to view Favorites.`}
+          </Text>
         </Card>
       </View>
     </ScreenContainer>

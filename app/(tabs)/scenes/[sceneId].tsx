@@ -34,7 +34,14 @@ export default function SceneDetailScreen() {
           {scene.categories.length > 1 ? <SectionHeading title={category.label} /> : null}
           <View style={styles.phraseList}>
             {category.phrases.map((phrase) => (
-              <PhraseCard key={phrase.id} zh={phrase.zh} ja={phrase.ja} romaji={phrase.romaji} english={phrase.english} />
+              <PhraseCard
+                key={phrase.id}
+                zh={phrase.zh}
+                ja={phrase.ja}
+                romaji={phrase.romaji}
+                english={phrase.english}
+                favorite={{ phraseKey: phrase.id, sceneId: scene.id, sceneTitle: scene.title }}
+              />
             ))}
           </View>
         </View>

@@ -5,6 +5,13 @@ import { Linking, Pressable, StyleSheet, Text, View } from 'react-native';
 import { AppIcon } from '@/src/design-system/components/AppIcon';
 import { Card } from '@/src/design-system/components/Card';
 import { color, radius, spacing, typography } from '@/src/design-system/tokens';
+import { useFavoritesStore } from '@/src/state/favoritesStore';
+
+export type FavoriteContext = {
+  phraseKey: string;
+  sceneId?: string;
+  sceneTitle?: string;
+};
 
 type Props = {
   zh: string;
@@ -14,20 +21,43 @@ type Props = {
   /** e.g. "tel:110" — when present, a real Call button is shown. */
   tel?: string;
   telLabel?: string;
+  /** When present, a real favorite/unfavorite star is shown, backed by SQLite (see docs/ARCHITECTURE.md). */
+  favorite?: FavoriteContext;
 };
 
 /**
- * Displays one phrase. Copy is real (device clipboard). Play is
- * intentionally shown as disabled — TTS is not implemented until Phase 3,
- * and this must never look like a working control per docs/MVP_SCOPE.md.
+ * Displays one phrase. Copy and Favorite are real (device clipboard and
+ * on-device SQLite). Play is intentionally shown as disabled — TTS is not
+ * implemented until Phase 3, and this must never look like a working
+ * control per docs/MVP_SCOPE.md.
  */
-export function PhraseCard({ zh, ja, romaji, english, tel, telLabel }: Props) {
+export function PhraseCard({ zh, ja, romaji, english, tel, telLabel, favorite }: Props) {
   const [copied, setCopied] = useState(false);
+
+  const isFavorited = useFavoritesStore((state) =>
+    favorite ? state.favorites.some((f) => f.phraseKey === favorite.phraseKey) : false
+  );
+  const storageAvailable = useFavoritesStore((state) => state.storageAvailable);
+  const toggleFavorite = useFavoritesStore((state) => state.toggleFavorite);
 
   async function handleCopy() {
     await Clipboard.setStringAsync(ja);
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
+  }
+
+  function handleToggleFavorite() {
+    if (!favorite) return;
+    toggleFavorite({
+      phraseKey: favorite.phraseKey,
+      sceneId: favorite.sceneId,
+      sceneTitle: favorite.sceneTitle,
+      zh,
+      ja,
+      romaji,
+      english,
+      tel,
+    });
   }
 
   return (
@@ -57,6 +87,27 @@ export function PhraseCard({ zh, ja, romaji, english, tel, telLabel }: Props) {
           <AppIcon name={{ ios: 'speaker.slash', android: 'volume_off', web: 'volume_off' }} size={18} tintColor={color.textMuted} />
           <Text style={[typography.caption, { color: color.textMuted }]}>Audio — coming soon</Text>
         </View>
+
+        {favorite ? (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityState={{ disabled: !storageAvailable, selected: isFavorited }}
+            accessibilityLabel={
+              !storageAvailable ? 'Favorites unavailable' : isFavorited ? 'Remove from favorites' : 'Add to favorites'
+            }
+            disabled={!storageAvailable}
+            onPress={handleToggleFavorite}
+            style={({ pressed }) => [styles.actionButton, { opacity: !storageAvailable ? 0.5 : pressed ? 0.7 : 1 }]}>
+            <AppIcon
+              name={{ ios: isFavorited ? 'star.fill' : 'star', android: isFavorited ? 'star' : 'star_outline', web: isFavorited ? 'star' : 'star_outline' }}
+              size={18}
+              tintColor={isFavorited ? color.accent : color.textSecondary}
+            />
+            <Text style={[typography.caption, { color: isFavorited ? color.accent : color.textSecondary }]}>
+              {!storageAvailable ? 'Favorites unavailable' : isFavorited ? 'Favorited' : 'Favorite'}
+            </Text>
+          </Pressable>
+        ) : null}
 
         {tel ? (
           <Pressable

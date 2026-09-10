@@ -8,6 +8,7 @@ import { Card } from '@/src/design-system/components/Card';
 import { ScreenContainer } from '@/src/design-system/components/ScreenContainer';
 import { SectionHeading } from '@/src/design-system/components/SectionHeading';
 import { color, radius, spacing, typography } from '@/src/design-system/tokens';
+import { useNetworkStatus } from '@/src/state/useNetworkStatus';
 
 type Tone = 'polite' | 'simple' | 'urgent';
 
@@ -19,6 +20,7 @@ const TONES: { id: Tone; label: string }[] = [
 
 export default function TranslateScreen() {
   const router = useRouter();
+  const network = useNetworkStatus();
   const [input, setInput] = useState('');
   const [tone, setTone] = useState<Tone>('polite');
   const [attempted, setAttempted] = useState(false);
@@ -26,11 +28,17 @@ export default function TranslateScreen() {
   return (
     <ScreenContainer>
       <View>
-        <Badge label="Not connected yet" tone="warning" />
+        <View style={styles.badgeRow}>
+          <Badge
+            label={network === 'checking' ? 'Checking connection' : network === 'online' ? 'Online' : 'Offline'}
+            tone={network === 'online' ? 'success' : network === 'offline' ? 'warning' : 'neutral'}
+          />
+          <Badge label="AI translation not built yet" tone="warning" />
+        </View>
         <Text style={[typography.title, styles.title]}>Translate</Text>
         <Text style={[typography.body, styles.subtitle]}>
-          Type what you want to say in Chinese. A live Japanese translation service is not wired up in
-          this build yet — see the note below.
+          Type what you want to say in Chinese. Live AI translation needs an internet connection once it
+          exists — it is not wired up in this build yet, regardless of your connection right now.
         </Text>
       </View>
 
@@ -87,8 +95,16 @@ export default function TranslateScreen() {
       ) : null}
 
       <Card>
+        <Text style={[typography.label, styles.footnoteTitle]}>Offline phrase library available</Text>
         <Text style={[typography.caption, styles.footnote]}>
-          Offline phrase library (Scenes and Emergency) always works, with or without a connection.
+          Scenes and Emergency are bundled with the app and always work, with or without a connection.
+        </Text>
+        <Text style={[typography.label, styles.footnoteTitle, styles.footnoteSpacing]}>
+          AI translation requires an internet connection
+        </Text>
+        <Text style={[typography.caption, styles.footnote]}>
+          Once built, typing a new phrase here will need connectivity. It will never work offline, and
+          this screen will always say so rather than pretending otherwise.
         </Text>
       </Card>
     </ScreenContainer>
@@ -96,6 +112,11 @@ export default function TranslateScreen() {
 }
 
 const styles = StyleSheet.create({
+  badgeRow: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+    flexWrap: 'wrap',
+  },
   title: {
     color: color.textPrimary,
     marginTop: spacing.sm,
@@ -134,6 +155,13 @@ const styles = StyleSheet.create({
   },
   notice: {
     color: color.textSecondary,
+  },
+  footnoteTitle: {
+    color: color.textPrimary,
+    marginBottom: spacing.xs,
+  },
+  footnoteSpacing: {
+    marginTop: spacing.md,
   },
   noticeButton: {
     marginTop: spacing.md,

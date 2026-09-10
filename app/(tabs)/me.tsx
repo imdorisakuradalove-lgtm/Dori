@@ -1,5 +1,4 @@
 import Constants from 'expo-constants';
-import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Badge } from '@/src/design-system/components/Badge';
@@ -7,12 +6,20 @@ import { Card } from '@/src/design-system/components/Card';
 import { ScreenContainer } from '@/src/design-system/components/ScreenContainer';
 import { SectionHeading } from '@/src/design-system/components/SectionHeading';
 import { color, radius, spacing, typography } from '@/src/design-system/tokens';
-
-type FontSize = 'default' | 'large';
+import { type FontSize, useSettingsStore } from '@/src/state/settingsStore';
 
 export default function MeScreen() {
-  const [fontSize, setFontSize] = useState<FontSize>('default');
+  const fontSize = useSettingsStore((state) => state.fontSize);
+  const storageAvailable = useSettingsStore((state) => state.storageAvailable);
+  const lastWriteFailed = useSettingsStore((state) => state.lastWriteFailed);
+  const setFontSize = useSettingsStore((state) => state.setFontSize);
   const version = Constants.expoConfig?.version ?? 'unknown';
+
+  const settingsBadge = !storageAvailable
+    ? { label: 'Local storage unavailable — not saved', tone: 'warning' as const }
+    : lastWriteFailed
+      ? { label: 'Could not save — will retry next change', tone: 'warning' as const }
+      : { label: 'Saved on this device', tone: 'success' as const };
 
   return (
     <ScreenContainer>
@@ -44,7 +51,7 @@ export default function MeScreen() {
           ]}>
           助けてください。
         </Text>
-        <Badge label="Preview only — not saved in this build" tone="warning" />
+        <Badge label={settingsBadge.label} tone={settingsBadge.tone} />
       </Card>
 
       <Card>
@@ -57,7 +64,7 @@ export default function MeScreen() {
         <Text style={[typography.body, styles.rowBody]}>
           A real-world communication survival tool for Chinese travelers in Japan.
         </Text>
-        <Text style={[typography.caption, styles.version]}>Version {version} · Phase 0</Text>
+        <Text style={[typography.caption, styles.version]}>Version {version} · Phase 1</Text>
       </Card>
     </ScreenContainer>
   );
