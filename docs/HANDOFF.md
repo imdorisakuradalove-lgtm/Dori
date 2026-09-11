@@ -1,8 +1,11 @@
 # Handoff — DoriGo / Pocket Talk
 
 Written for a fresh Claude Code session with zero memory of prior
-conversations. Read this file plus `CLAUDE.md`, `AUDIT.md`, and `docs/`
-before doing anything else in this repo.
+conversations. Read **`docs/PROJECT_INDEX.md` first** (the permanent
+high-level map — purpose, phases, architecture, constraints), then this
+file for the exact current state, then `CLAUDE.md` and `AUDIT.md` for
+full context. This file changes every session; `PROJECT_INDEX.md` should
+rarely need to.
 
 ## 1. Project goal and product purpose
 
@@ -49,46 +52,53 @@ must not be started next. See §13.
   `docs/DEVICE_TESTING.md` and walked the user through the first step of
   bringing the app up on their iPhone.
 - All seven product/architecture docs required by the approved brief
-  exist in `docs/` (see §11 file list) plus `AUDIT.md` and `CLAUDE.md` at
-  the repo root.
+  exist in `docs/`, plus `AUDIT.md` and `CLAUDE.md` at the repo root, plus
+  `docs/DEVICE_TESTING.md` (Phase 1.1) and now `docs/PROJECT_INDEX.md` +
+  this file for cross-session continuity. Full list with descriptions:
+  `docs/PROJECT_INDEX.md`'s documentation map.
 
-## 4. What was changed in this (handoff) session
+## 4. What was changed in this (repository organization) session
 
-Nothing except writing this file. No application code was touched. This
-session only inspected the repository (`git status`, `git log`, file
-listing, `package.json`) and wrote `docs/HANDOFF.md`.
+Documentation-only reorganization for cross-session continuity. No
+application code, configuration, or product scope was touched — this
+session ran `git status`/`git log`/file inspection, then created
+`docs/PROJECT_INDEX.md` (the permanent high-level map) and refreshed this
+file. No device testing happened in this session — the Phase 1.1 device
+test state described below is unchanged from before this session started.
 
 ## 5. Files created or modified in this session
 
-- **Created:** `docs/HANDOFF.md` (this file).
-- **Modified:** none.
+- **Created:** `docs/PROJECT_INDEX.md`.
+- **Modified:** `docs/HANDOFF.md` (this file — refreshed pointers and
+  session-specific sections; the substantive Phase 1.1 state in §2, §9,
+  §10, §13 is carried over unchanged because nothing about it changed).
 
 (For the full history of what earlier sessions changed, see the commit
 log in §7 — each commit message describes that commit's own scope.)
 
 ## 6. Git status (at time of writing this handoff)
 
-```
-On branch claude/dorigo-audit-r055nk
-Your branch is up to date with 'origin/claude/dorigo-audit-r055nk'.
-
-nothing to commit, working tree clean
-```
-
-(This was true *before* `docs/HANDOFF.md` was added; adding this file
-will make the tree show one new untracked file until it's committed —
-see §15 for whether to commit it.)
+Before this session's documentation commit, the tree was clean at
+`d8d6183`. This session adds `docs/PROJECT_INDEX.md` and modifies
+`docs/HANDOFF.md`, then commits and pushes them together as one
+documentation-only commit. Run `git status` and `git log --oneline -3` to
+see the actual current state — do not trust a hash written here over the
+live output of those commands.
 
 ## 7. Current branch and latest commit
 
 - Branch: `claude/dorigo-audit-r055nk`
-- Latest commit at handoff time: `b1050e4` — "Phase 1.1: add real-device
-  (Expo Go) testing guide, no app code changes"
-- Commit history (oldest → newest):
+- Commit history (oldest → newest) as of this session:
   1. `c2fa843` — Product/technical audit (`AUDIT.md`)
   2. `118d6ff` — Phase 0: project docs and app foundation
   3. `5900bfb` — Phase 1: real offline persistence for favorites and settings
   4. `b1050e4` — Phase 1.1: device testing guide (docs only)
+  5. `d8d6183` — First handoff document (docs only)
+  6. *(this session)* — repository continuity docs: adds
+     `docs/PROJECT_INDEX.md`, refreshes this file (docs only)
+
+Run `git log --oneline -3` for the exact current hash — this list is a
+summary, not a substitute for checking live state.
 
 ## 8. What has been verified
 
@@ -237,8 +247,8 @@ bug and ask before touching code.
 
 ## 14. Numbered plan for the next session
 
-1. Read this file, `CLAUDE.md`, `AUDIT.md`, and skim `docs/` — do not
-   assume prior context.
+1. Read `docs/PROJECT_INDEX.md`, then this file, then `CLAUDE.md` and
+   `AUDIT.md` — do not assume prior context.
 2. Confirm current repo state (`git status`, `git log -5`) matches what's
    documented here before touching anything.
 3. Ask the user for the Step 1 (`npm install`) result if not already
